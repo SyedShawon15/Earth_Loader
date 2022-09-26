@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+<title>Magic Zoom Plus</title>
+
+<link href="magiczoomplus/magiczoomplus.css" rel="stylesheet" type="text/css" media="screen"/>
+<script src="magiczoomplus/magiczoomplus.js" type="text/javascript"></script>
+
+<style type="text/css">
+    html { position: relative; min-height: 100%; }
+    body { position: absolute; left:0; right: 0; min-height: 100%; background:#fff; margin:0; padding:0; font-size: 100%; }
+</style>
+
+<script type="text/javascript">
+
+    function isDefaultOption(o) {
+        return magicJS.$A(magicJS.$(o).byTag('option')).filter(function(opt){
+            return opt.selected && opt.defaultSelected;
+        }).length > 0;
+    }
+
+    function toOptionValue(v) {
+        if ( /^(true|false)$/.test(v) ) {
+            return 'true' === v;
+        }
+        if ( /^[0-9]{1,}$/i.test(v) ) {
+            return parseInt(v,10);
+        }
+        return v;
+    }
+
+    function makeOptions(optType) {
+        var  value = null, isDefault = true, newParams = Array(), newParamsS = '', options = {};
+        magicJS.$(magicJS.$A(magicJS.$(optType).getElementsByTagName("INPUT"))
+            .concat(magicJS.$A(magicJS.$(optType).getElementsByTagName('SELECT'))))
+            .forEach(function(param){
+                value = ('checkbox'==param.type) ? param.checked.toString() : param.value;
+
+                isDefault = ('checkbox'==param.type) ? value == param.defaultChecked.toString() :
+                    ('SELECT'==param.tagName) ? isDefaultOption(param) : value == param.defaultValue;
+
+                if ( null !== value && !isDefault) {
+                    options[param.name] = toOptionValue(value);
+                }
+        });
+        return options;
+    }
+
+    function updateScriptCode() {
+        var code = '&lt;script&gt;\nvar mzOptions = ';
+        code += JSON.stringify(mzOptions, null, 2).replace(/\"(\w+)\":/g,"$1:")+';';
+        code += '\n&lt;/script&gt;';
+
+        magicJS.$('app-code-sample-script').changeContent(code);
+    }
+
+    function updateInlineCode() {
+        var code = '&lt;a class="MagicZoom" data-options="';
+        code += JSON.stringify(mzOptions).replace(/\"(\w+)\":(?:\"([^"]+)\"|([^,}]+))(,)?/g, "$1: $2$3; ").replace(/\{([^{}]*)\}/,"$1").replace(/\s*$/,'');
+        code += '"&gt;';
+
+        magicJS.$('app-code-sample-inline').changeContent(code);
+    }
+
+    function applySettings() {
+        MagicZoom.stop('Zoom-1');
+        mzOptions = makeOptions('params');
+        mzMobileOptions = makeOptions('mobile-params');
+        MagicZoom.start('Zoom-1');
+        updateScriptCode();
+        updateInlineCode();
+        try {
+            prettyPrint();
+        } catch(e) {}
+    }
+
+    function copyToClipboard(src) {
+        var
+            copyNode,
+            range, success;
+
+        if (!isCopySupported()) {
+            disableCopy();
+            return;
+        }
+        copyNode = document.getElementById('code-to-copy');
+        copyNode.innerHTML = document.getElementById(src).innerHTML;
+
+        range = document.createRange();
+        range.selectNode(copyNode);
+        window.getSelection().addRange(range);
+
+        try {
+            success = document.execCommand('copy');
+        } catch(err) {
+            success = false;
+        }
+        window.getSelection().removeAllRanges();
+        if (!success) {
+            disableCopy();
+        } else {
+            new magicJS.Message('Settings code copied to clipboard.', 3000,
+                document.querySelector('.app-code-holder'), 'copy-msg');
+        }
+    }
+
+    function disableCopy() {
+        magicJS.$A(document.querySelectorAll('.cfg-btn-copy')).forEach(function(node) {
+            node.disabled = true;
+        });
+        new magicJS.Message('Sorry, cannot copy settings code to clipboard. Please select and copy code manually.', 3000,
+            document.querySelector('.app-code-holder'), 'copy-msg copy-msg-failed');
+    }
+
+    function isCopySupported() {
+        if ( !window.getSelection || !document.createRange || !document.queryCommandSupported ) { return false; }
+        return document.queryCommandSupported('copy');
+    }
+</script>
+</head>
+<body>
+<div class="preview col">
+
+    <div class="app-figure" id="zoom-fig">
+        <a id="Zoom-1" class="MagicZoom" title="Show your product in stunning detail with Magic Zoom Plus."
+            href="https://magictoolbox.sirv.com/images/magiczoomplus/colorful-colors-1.jpg?h=1400"
+            data-zoom-image-2x="https://magictoolbox.sirv.com/images/magiczoomplus/colorful-colors-1.jpg?h=2800"
+            data-image-2x="https://magictoolbox.sirv.com/images/magiczoomplus/colorful-colors-1.jpg?h=800"
+        >
+            <img src="https://magictoolbox.sirv.com/images/magiczoomplus/colorful-colors-1.jpg?h=400" srcset="https://magictoolbox.sirv.com/images/magiczoomplus/colorful-colors-1.jpg?h=800 2x"
+                alt=""/>
+        </a>
+        <div class="selectors">
+            <a
+                data-zoom-id="Zoom-1"
+                href="https://magictoolbox.sirv.com/images/magiczoomplus/colorful-colors-1.jpg?h=1400"
+                data-image="https://magictoolbox.sirv.com/images/magiczoomplus/colorful-colors-1.jpg?h=400"
+                data-zoom-image-2x="https://magictoolbox.sirv.com/images/magiczoomplus/colorful-colors-1.jpg?h=2800"
+                data-image-2x="https://magictoolbox.sirv.com/images/magiczoomplus/colorful-colors-1.jpg?h=800"
+            >
+                <img srcset="https://magictoolbox.sirv.com/images/magiczoomplus/colorful-colors-1.jpg?h=120 2x" src="https://magictoolbox.sirv.com/images/magiczoomplus/colorful-colors-1.jpg?h=60"/>
+            </a>
+            <a
+                data-zoom-id="Zoom-1"
+                href="https://magictoolbox.sirv.com/images/magiczoomplus/colorful-colors-2.jpg?h=1400"
+                data-image="https://magictoolbox.sirv.com/images/magiczoomplus/colorful-colors-2.jpg?h=400"
+                data-zoom-image-2x="https://magictoolbox.sirv.com/images/magiczoomplus/colorful-colors-2.jpg?h=2800"
+                data-image-2x="https://magictoolbox.sirv.com/images/magiczoomplus/colorful-colors-2.jpg?h=800"
+            >
+                <img srcset="https://magictoolbox.sirv.com/images/magiczoomplus/colorful-colors-2.jpg?h=120 2x" src="https://magictoolbox.sirv.com/images/magiczoomplus/colorful-colors-2.jpg?h=60"/>
+            </a>
+            <a
+                data-zoom-id="Zoom-1"
+                href="https://magictoolbox.sirv.com/images/magiczoomplus/colorful-colors-3.jpg?h=1400"
+                data-image="https://magictoolbox.sirv.com/images/magiczoomplus/colorful-colors-3.jpg?h=400"
+                data-zoom-image-2x="https://magictoolbox.sirv.com/images/magiczoomplus/colorful-colors-3.jpg?h=2800"
+                data-image-2x="https://magictoolbox.sirv.com/images/magiczoomplus/colorful-colors-3.jpg?h=800"
+            >
+                <img srcset="https://magictoolbox.sirv.com/images/magiczoomplus/colorful-colors-3.jpg?h=120 2x" src="https://magictoolbox.sirv.com/images/magiczoomplus/colorful-colors-3.jpg?h=60"/>
+            </a>
+            <a
+                data-zoom-id="Zoom-1"
+                href="https://magictoolbox.sirv.com/images/magiczoomplus/colorful-colors-4.jpg?h=1400"
+                data-image="https://magictoolbox.sirv.com/images/magiczoomplus/colorful-colors-4.jpg?h=400"
+                data-zoom-image-2x="https://magictoolbox.sirv.com/images/magiczoomplus/colorful-colors-4.jpg?h=2800"
+                data-image-2x="https://magictoolbox.sirv.com/images/magiczoomplus/colorful-colors-4.jpg?h=800"
+            >
+                <img srcset="https://magictoolbox.sirv.com/images/magiczoomplus/colorful-colors-4.jpg?h=120 2x" src="https://magictoolbox.sirv.com/images/magiczoomplus/colorful-colors-4.jpg?h=60"/>
+            </a>
+            <a
+                data-zoom-id="Zoom-1"
+                href="https://magictoolbox.sirv.com/images/magiczoomplus/colorful-colors-5.jpg?h=1400"
+                data-image="https://magictoolbox.sirv.com/images/magiczoomplus/colorful-colors-5.jpg?h=400"
+                data-zoom-image-2x="https://magictoolbox.sirv.com/images/magiczoomplus/colorful-colors-5.jpg?h=2800"
+                data-image-2x="https://magictoolbox.sirv.com/images/magiczoomplus/colorful-colors-5.jpg?h=800"
+            >
+                <img srcset="https://magictoolbox.sirv.com/images/magiczoomplus/colorful-colors-5.jpg?h=120 2x" src="https://magictoolbox.sirv.com/images/magiczoomplus/colorful-colors-5.jpg?h=60"/>
+            </a>
+            <a
+                data-zoom-id="Zoom-1"
+                href="https://magictoolbox.sirv.com/images/magiczoomplus/colorful-colors-6.jpg?h=1400"
+                data-image="https://magictoolbox.sirv.com/images/magiczoomplus/colorful-colors-6.jpg?h=400"
+                data-zoom-image-2x="https://magictoolbox.sirv.com/images/magiczoomplus/colorful-colors-6.jpg?h=2800"
+                data-image-2x="https://magictoolbox.sirv.com/images/magiczoomplus/colorful-colors-6.jpg?h=800"
+            >
+                <img srcset="https://magictoolbox.sirv.com/images/magiczoomplus/colorful-colors-6.jpg?h=120 2x" src="https://magictoolbox.sirv.com/images/magiczoomplus/colorful-colors-6.jpg?h=60"/>
+            </a>
+        </div>
+    </div>
+
+    <div class="app-code-sample">
+        <input type="radio" name="code-sample-nav" id="code-sample-nav-1" checked="checked"><label for="code-sample-nav-1">Global settings</label
+        ><input type="radio" name="code-sample-nav" id="code-sample-nav-2"><label for="code-sample-nav-2">Inline settings</label>
+        <div class="app-code-holder">
+            <div>
+                <pre class="prettyprint" id="app-code-sample-script">
+                    &lt;script&gt;
+                    var mzOptions = {};
+                    &lt;/script&gt;
+                </pre>
+                <button class="cfg-btn cfg-btn-copy" autocomplete="off" onclick="copyToClipboard('app-code-sample-script')">Copy</button>
+            </div>
+            <div>
+                <pre class="prettyprint" id="app-code-sample-inline">
+                    &lt;a class="MagicZoom" data-options=""&gt;
+                </pre>
+                <button class="cfg-btn cfg-btn-copy" autocomplete="off" onclick="copyToClipboard('app-code-sample-inline')">Copy</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="wizard-settings col">
+    <div class="settings-controls">
+        <button class="cfg-btn btn-preview" form="app-params-form" autocomplete="off" onclick="applySettings();">Apply settings</button>
+    </div>
+    <div class="inner">
+        <form id="app-params-form" autocomplete="off" onsubmit="return false;">
+        <table id="params">
+        <caption>
+            General settings
+        </caption>
+        <tr>
+            <td>zoomMode</td>
+            <td>
+                <select name="zoomMode">
+                    <option value="zoom" selected="selected">zoom</option>
+                    <option value="magnifier">magnifier</option>
+                    <option value="preview">preview</option>
+                    <option value="off">off</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>zoomOn</td>
+            <td>
+                <select name="zoomOn">
+                    <option value="hover" selected="selected">hover</option>
+                    <option value="click">click</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>zoomPosition</td>
+            <td>
+                <select name="zoomPosition">
+                    <option value="right" selected="selected">right</option>
+                    <option value="left">left</option>
+                    <option value="top">top</option>
+                    <option value="bottom">bottom</option>
+                    <option value="inner">inner</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>zoomWidth</td>
+            <td><input type="text" name="zoomWidth" value="auto"></td>
+        </tr>
+        <tr>
+            <td>zoomHeight</td>
+            <td><input type="text" name="zoomHeight" value="auto"></td>
+        </tr>
+        <tr>
+            <td>zoomDistance</td>
+            <td><input type="text" name="zoomDistance" value="15"></td>
+        </tr>
+        <tr>
+            <td>zoomCaption</td>
+            <td>
+                <select name="zoomCaption">
+                    <option value="off" selected="selected">off</option>
+                    <option value="bottom">bottom</option>
+                    <option value="top">top</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>expand</td>
+            <td>
+                <select name="expand" >
+                    <option selected="selected" value="window">window</option>
+                    <option value="fullscreen">fullscreen</option>
+                    <option value="off">off</option>
+                    
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>expandZoomMode</td>
+            <td>
+                <select name="expandZoomMode" >
+                    <option selected="selected" value="zoom">zoom</option>
+                    <option value="magnifier">magnifier</option>
+                    <option value="off">off</option>
+                    
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>expandZoomOn</td>
+            <td>
+                <select name="expandZoomOn" >
+                    <option selected="selected" value="click">click</option>
+                    <option value="always">always</option>
+                    
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>expandCaption</td>
+            <td>
+                <select name="expandCaption" >
+                    <option selected="selected" value="true">true</option>
+                    <option value="false">false</option>
+                    
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>closeOnClickOutside</td>
+            <td>
+                <select name="closeOnClickOutside" >
+                    <option selected="selected" value="true">true</option>
+                    <option value="false">false</option>
+                    
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>history</td>
+            <td>
+                <select name="history" >
+                    <option selected="selected" value="true">true</option>
+                    <option value="false">false</option>
+                    
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>hint</td>
+            <td>
+                <select name="hint">
+                    <option value="once" selected="selected">once</option>
+                    <option value="always">always</option>
+                    <option value="off">off</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>smoothing</td>
+            <td>
+                <select name="smoothing">
+                    <option value="true" selected="selected">true</option>
+                    <option value="false">false</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>variableZoom</td>
+            <td>
+                <select name="variableZoom">
+                    <option value="false" selected="selected">false</option>
+                    <option value="true">true</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>lazyZoom</td>
+            <td>
+                <select name="lazyZoom">
+                    <option value="false" selected="selected">false</option>
+                    <option value="true">true</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>upscale</td>
+            <td>
+                <select name="upscale">
+                    <option value="true" selected="selected">true</option>
+                    <option value="false">false</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>rightClick</td>
+            <td>
+                <select name="rightClick">
+                    <option value="false" selected="selected">false</option>
+                    <option value="true">true</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>transitionEffect</td>
+            <td>
+                <select name="transitionEffect">
+                    <option value="true" selected="selected">true</option>
+                    <option value="false">false</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>selectorTrigger</td>
+            <td>
+                <select name="selectorTrigger">
+                    <option value="click" selected="selected">click</option>
+                    <option value="hover">hover</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>cssClass</td>
+            <td><input type="text" name="cssClass" value=""></td>
+        </tr>
+
+        <tr>
+            <td>textHoverZoomHint</td>
+            <td><input type="text" name="textHoverZoomHint" value="Hover to zoom"></td>
+        </tr>
+        <tr>
+            <td>textClickZoomHint</td>
+            <td><input type="text" name="textClickZoomHint" value="Click to zoom"></td>
+        </tr>
+        <tr>
+            <td>textExpandHint</td>
+            <td><input type="text" name="textExpandHint" value="Click to expand" ></td>
+        </tr>
+        <tr>
+            <td>textBtnClose</td>
+            <td><input type="text" name="textBtnClose" value="Close" ></td>
+        </tr>
+        <tr>
+            <td>textBtnNext</td>
+            <td><input type="text" name="textBtnNext" value="Next" ></td>
+        </tr>
+        <tr>
+            <td>textBtnPrev</td>
+            <td><input type="text" name="textBtnPrev" value="Previous" ></td>
+        </tr>
+        </table>
+
+        <table id="mobile-params">
+        <caption>
+            Special settings for mobile
+        </caption>
+        <tr>
+            <td>zoomMode</td>
+            <td>
+                <select name="zoomMode">
+                    <option value="zoom" selected="selected">zoom</option>
+                    <option value="magnifier">magnifier</option>
+                    <option value="off">off</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>textHoverZoomHint</td>
+            <td><input type="text" name="textHoverZoomHint" value="Touch to zoom"></td>
+        </tr>
+        <tr>
+            <td>textClickZoomHint</td>
+            <td><input type="text" name="textClickZoomHint" value="Double tap or pinch to zoom"></td>
+        </tr>
+        <tr>
+            <td>textExpandHint</td>
+            <td><input type="text" name="textExpandHint" value="Tap or pinch to expand" ></td>
+        </tr>
+        </table>
+        </form>
+    </div>
+    <div class="footer">&copy; <a href="https://www.magictoolbox.com">Magic Toolbox</a></div>
+</div>
+<div id="code-to-copy"></div>
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.css">
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/prettify/188.0.0/prettify.min.js"></script>
+<script>try { prettyPrint(); } catch(e) {}</script>
+</body></html>
